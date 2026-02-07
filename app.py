@@ -40,7 +40,8 @@ def load_and_process_data(uploaded_file) -> pd.DataFrame:
     df["Category"] = df.apply(
         lambda row: categorize_transaction(
             str(row.get("Details", "")),
-            str(row.get("Particulars", ""))
+            str(row.get("Particulars", "")),
+            str(row.get("Type", ""))
         ),
         axis=1
     )
@@ -90,17 +91,23 @@ def display_monthly_chart(df: pd.DataFrame):
     expenses_df["Amount"] = expenses_df["Amount"].abs()
 
     monthly_expenses = expenses_df.groupby("Month")["Amount"].sum().reset_index()
-    monthly_expenses = monthly_expenses.sort_values("Month")
+    # Sort chronologically by converting to datetime, then format as readable month
+    monthly_expenses["Month_dt"] = pd.to_datetime(monthly_expenses["Month"])
+    monthly_expenses = monthly_expenses.sort_values("Month_dt")
+    monthly_expenses["Month_Label"] = monthly_expenses["Month_dt"].dt.strftime("%b %Y")
 
     fig = px.bar(
         monthly_expenses,
-        x="Month",
+        x="Month_Label",
         y="Amount",
         title="Monthly Expenses",
-        labels={"Amount": "Total Spent ($)", "Month": "Month"},
+        labels={"Amount": "Total Spent ($)", "Month_Label": "Month"},
         color_discrete_sequence=["#FF6B6B"]
     )
-    fig.update_layout(xaxis_tickangle=-45)
+    fig.update_layout(
+        xaxis_tickangle=-45,
+        xaxis={'type': 'category', 'categoryorder': 'array', 'categoryarray': monthly_expenses["Month_Label"].tolist()}
+    )
 
     st.plotly_chart(fig, use_container_width=True)
 
