@@ -3,18 +3,18 @@
 # Category keyword mappings
 # Keywords are matched case-insensitively against Details and Particulars columns
 CATEGORIES = {
-    "Transport": ["uber", "lime", "fuel", "z energy", "bp", "caltex", "mobil", "taxi", "at hop", "bus", "train"],
-    "Groceries": ["countdown", "pak n save", "new world", "supermarket", "woolworths", "fresh choice", "four square"],
+    "Transport": ["bp"],
+    "Groceries": ["countdown", "pak n save", "new world", "supermarket", "woolworths", "dairy", "four square"],
     "Insurance": ["insurance", "tower", "state", "aia", "southern cross", "nib", "rdi finance", "rdl premium finance"],
-    "Investments": ["sharesies", "hatch", "investnow", "smartshares", "simplicity"],
-    "Utilities": ["power", "electric", "water", "internet", "vodafone", "spark", "2degrees", "mercury", "genesis", "contact energy", "slingshot"],
-    "Entertainment": ["netflix", "spotify", "disney", "apple music", "youtube", "cinema", "movie", "ticketmaster"],
-    "Dining": ["restaurant", "cafe", "mcdonald", "uber eats", "menulog", "delivereasy", "burger", "pizza", "kfc", "wendy"],
-    "Pet": ["dog", "vet", "pet", "animates", "petstock"],
+    "Investments": ["sharesies"],
+    "Utilities": ["contact energy", "slingshot"],
+    "Entertainment": ["globe", "youtube", "cinema",],
+    "Dining": ["sushi", "cafe", "thai", "alexandre", "afghan darbar"],
+    "Pet": ["dog", "vet", "pet", "animates", "petstock", "farmlands"],
     "Healthcare": ["pharmacy", "chemist", "doctor", "medical", "hospital", "dentist", "optometrist"],
-    "Shopping": ["amazon", "warehouse", "kmart", "target", "farmers", "briscoes", "rebel sport"],
-    "Subscriptions": ["subscription", "monthly", "annual fee", "membership"],
-    "Education": ["school", "university", "course", "tuition", "book"],
+    "Shopping": ["pb", "warehouse", "kmart", "target", "farmers", "briscoes", "mitre10", "mitre 10"],
+    "Subscriptions": ["openai"],
+    "Education": ["book"],
     "Holiday": ["holiday"],
 }
 
@@ -38,6 +38,11 @@ def categorize_transaction(details: str, particulars: str, transaction_type: str
     # Loan Payments are categorized as Mortgage
     if transaction_type and transaction_type.lower() == "loan payment":
         return "Mortgage"
+
+    # Joint account transfers are Income
+    memo_lower = (particulars or "").lower()
+    if "joint" in memo_lower or "joint accoun" in memo_lower:
+        return "Income"
 
     # Combine and lowercase for matching
     search_text = f"{details or ''} {particulars or ''}".lower()
